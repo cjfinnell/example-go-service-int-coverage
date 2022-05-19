@@ -1,0 +1,12 @@
+services:
+  redis:
+    container_name: redis
+    image: redis:7
+  rediswrapper:
+    container_name: rediswrapper
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    environment:
+      REDIS_URL: redis:6379
