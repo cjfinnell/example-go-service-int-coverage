@@ -10,6 +10,12 @@ ADD . .
 RUN apk add make git gcc musl-dev
 CMD make _int-test
 
+FROM golang:1.18-alpine3.16 as fuzz
+WORKDIR /fuzz
+ADD . .
+RUN apk add make git gcc musl-dev
+CMD go test -v -fuzz FuzzIntegration
+
 FROM alpine:3.16 as run
 WORKDIR /app
 COPY --from=build /build/rediswrapper .

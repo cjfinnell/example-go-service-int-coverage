@@ -24,6 +24,13 @@ test:
 _int-test: .bin/gotestsum
 	@.bin/gotestsum -- -cover -coverprofile coverage.txt ./...
 
+.PHONY: fuzz
+fuzz:
+	@docker compose up -d --build --force-recreate redis
+	@docker build --target fuzz -t rediswrapper-fuzz .
+	@docker run -it --network testnet --name rediswrapper-fuzz rediswrapper-fuzz
+	@docker cp rediswrapper-int-test:/fuzz/testdata .
+
 .PHONY: run
 run:
 	@docker compose up --build --force-recreate
@@ -31,7 +38,7 @@ run:
 .PHONY: clean
 clean:
 	@docker compose rm -sf
-	-@docker rm -f rediswrapper-int-test
+	-@docker rm -f rediswrapper-int-test rediswrapper-fuzz
 	-@docker network rm testnet
 	@rm -rf .bin/ coverage.txt
 	@go clean -testcache
