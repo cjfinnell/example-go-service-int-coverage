@@ -8,7 +8,7 @@ import (
 )
 
 type server struct {
-	redis  redisWrapper
+	redis  RedisWrapper
 	router *httprouter.Router
 }
 
