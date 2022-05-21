@@ -11,7 +11,7 @@ mocks: .bin/mockery
 
 .PHONY: test
 test: .bin/gotestsum
-	@.bin/gotestsum ./... -- -parallel
+	@.bin/gotestsum -- -cover -coverprofile coverage.txt ./...
 
 .PHONY: run
 run:
@@ -20,7 +20,7 @@ run:
 .PHONY: clean
 clean:
 	@docker compose rm -sf
-	@rm -rf .bin/
+	@rm -rf .bin/ coverage.txt
 	@go clean -testcache
 
 .PHONY: lint

@@ -1,0 +1,30 @@
+version: 2.1
+orbs:
+  codecov: codecov/codecov@3.2.2
+
+executors:
+  go:
+    docker:
+      - image: cimg/go:1.18
+    resource_class: small
+
+jobs:
+  lint:
+    executor: go
+    steps:
+      - checkout
+      - run: make lint
+  test:
+    executor: go
+    steps:
+      - checkout
+      - run: make test
+      - codecov/upload
+
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - lint
+      - test

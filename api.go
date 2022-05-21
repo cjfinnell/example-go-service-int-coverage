@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -32,7 +33,7 @@ func (s *server) handleGet(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if err != nil {
-		http.Error(w, "failed to get value for key", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("failed to get value for key: %s", err), http.StatusInternalServerError)
 
 		return
 	}
@@ -59,7 +60,7 @@ func (s *server) handleSet(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if err := s.redis.Set(key, value); err != nil {
-		http.Error(w, "failed to set value for key", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("failed to set value for key: %s", err), http.StatusInternalServerError)
 
 		return
 	}
@@ -78,7 +79,7 @@ func (s *server) handleDel(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if err := s.redis.Del(key); err != nil {
-		http.Error(w, "failed to delete key", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("failed to delete key: %s", err), http.StatusInternalServerError)
 
 		return
 	}
