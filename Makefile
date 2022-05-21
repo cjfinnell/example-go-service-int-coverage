@@ -9,8 +9,19 @@ mocks: .bin/mockery
 	@echo "generating mocks..."
 	@go generate ./...
 
+.PHONY: unit-test
+unit-test: .bin/gotestsum
+	@.bin/gotestsum -- -cover -coverprofile coverage.txt -short ./...
+
 .PHONY: test
-test: .bin/gotestsum
+test:
+	@docker compose up -d --build --force-recreate redis
+	@docker build --target test -t rediswrapper-int-test .
+	@docker run -it --network testnet --name rediswrapper-int-test rediswrapper-int-test
+	@docker cp rediswrapper-int-test:/test/coverage.txt .
+
+.PHONY: _int-test
+_int-test: .bin/gotestsum
 	@.bin/gotestsum -- -cover -coverprofile coverage.txt ./...
 
 .PHONY: run
@@ -20,6 +31,8 @@ run:
 .PHONY: clean
 clean:
 	@docker compose rm -sf
+	-@docker rm -f rediswrapper-int-test
+	-@docker network rm testnet
 	@rm -rf .bin/ coverage.txt
 	@go clean -testcache
 

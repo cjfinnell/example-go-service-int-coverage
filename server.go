@@ -9,29 +9,28 @@ import (
 
 type server struct {
 	redis  RedisWrapper
-	router *httprouter.Router
+	router http.Handler
 }
 
 func newServer(conf *config) *server {
-	return &server{
-		redis:  newRedisWrap(conf),
-		router: httprouter.New(),
+	s := server{
+		redis: newRedisWrap(conf),
 	}
+	router := httprouter.New()
+	router.GET(routeKey, s.handleGet)
+	router.POST(routeKeyValue, s.handleSet)
+	router.DELETE(routeKey, s.handleDel)
+	s.router = requestLogger(authWrap(router))
+
+	return &s
 }
 
 func (s *server) run() error {
+	addr := ":8080"
+
 	defer s.redis.Close()
 
-	s.router.GET(routeKey, s.handleGet)
-	s.router.POST(routeKeyValue, s.handleSet)
-	s.router.DELETE(routeKey, s.handleDel)
+	log.Printf("server listening on %s", addr)
 
-	srv := http.Server{
-		Addr:    ":8080",
-		Handler: requestLogger(authWrap(s.router)),
-	}
-
-	log.Printf("server listening on %s", srv.Addr)
-
-	return srv.ListenAndServe()
+	return http.ListenAndServe(addr, s.router)
 }
