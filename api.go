@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -19,16 +20,20 @@ func (s *server) handleGet(w http.ResponseWriter, r *http.Request, ps httprouter
 	key := ps.ByName(paramKey)
 	if key == "" {
 		http.Error(w, "missing key", http.StatusBadRequest)
+
 		return
 	}
 
 	value, err := s.redis.Get(key)
-	if err == ErrNotFound {
+	if errors.Is(err, ErrNotFound) {
 		http.Error(w, "key not found", http.StatusNotFound)
+
 		return
 	}
+
 	if err != nil {
 		http.Error(w, "failed to get value for key", http.StatusInternalServerError)
+
 		return
 	}
 
@@ -42,6 +47,7 @@ func (s *server) handleSet(w http.ResponseWriter, r *http.Request, ps httprouter
 	key := ps.ByName(paramKey)
 	if key == "" {
 		http.Error(w, "missing key", http.StatusBadRequest)
+
 		return
 	}
 
@@ -52,9 +58,9 @@ func (s *server) handleSet(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	err := s.redis.Set(key, value)
-	if err != nil {
+	if err := s.redis.Set(key, value); err != nil {
 		http.Error(w, "failed to set value for key", http.StatusInternalServerError)
+
 		return
 	}
 
@@ -67,12 +73,13 @@ func (s *server) handleDel(w http.ResponseWriter, r *http.Request, ps httprouter
 	key := ps.ByName(paramKey)
 	if key == "" {
 		http.Error(w, "missing key", http.StatusBadRequest)
+
 		return
 	}
 
-	err := s.redis.Del(key)
-	if err != nil {
+	if err := s.redis.Del(key); err != nil {
 		http.Error(w, "failed to delete key", http.StatusInternalServerError)
+
 		return
 	}
 

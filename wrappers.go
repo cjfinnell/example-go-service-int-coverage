@@ -14,14 +14,15 @@ func authWrap(next http.Handler) http.HandlerFunc {
 		if authValue != "" {
 			log.Print("auth successful")
 			next.ServeHTTP(w, r)
+
 			return
 		}
 
 		log.Print("auth failed")
 
 		w.WriteHeader(http.StatusUnauthorized)
-		_, err := w.Write([]byte("unauthorized"))
-		if err != nil {
+
+		if _, err := w.Write([]byte("unauthorized")); err != nil {
 			log.Printf("failed to write 'unauthorized' response: %s", err)
 		}
 	}

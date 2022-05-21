@@ -1,5 +1,6 @@
 .PHONY: deps
 deps:
+	@echo "refreshing dependencies..."
 	@go mod tidy
 	@go mod vendor
 

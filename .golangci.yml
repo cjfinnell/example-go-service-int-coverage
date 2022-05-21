@@ -1,2 +1,12 @@
 linters:
   enable-all: true
+  disable:
+    - exhaustivestruct
+    - exhaustruct
+    - golint # deprecated
+    - interfacer # deprecated
+    - maligned # deprecated
+    - scopelint # deprecated
+    - testpackage
+    - varnamelen
+    - wrapcheck
