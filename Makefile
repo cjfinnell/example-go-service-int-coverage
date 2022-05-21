@@ -31,6 +31,12 @@ fuzz:
 	@docker run -it --network testnet --name rediswrapper-fuzz rediswrapper-fuzz
 	@docker cp rediswrapper-int-test:/fuzz/testdata .
 
+.PHONY: load
+load:
+	@docker compose up -d --build --force-recreate
+	-@docker run -i --network testnet --name k6 loadimpact/k6 run - < load.js
+	@docker compose down
+
 .PHONY: run
 run:
 	@docker compose up --build --force-recreate
@@ -38,7 +44,7 @@ run:
 .PHONY: clean
 clean:
 	@docker compose rm -sf
-	-@docker rm -f rediswrapper-int-test rediswrapper-fuzz
+	-@docker rm -f rediswrapper-int-test rediswrapper-fuzz k6
 	-@docker network rm testnet
 	@rm -rf .bin/ coverage.txt
 	@go clean -testcache

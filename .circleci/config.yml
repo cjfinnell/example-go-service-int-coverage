@@ -18,9 +18,17 @@ jobs:
     executor: go
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.14
       - run: make test
       - codecov/upload
+  load:
+    executor: go
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+      - run: make load
 
 
 workflows:
@@ -29,3 +37,4 @@ workflows:
     jobs:
       - lint
       - test
+      - load
