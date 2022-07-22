@@ -3,13 +3,16 @@ services:
     container_name: redis
     networks:
       - testnet
-    image: redis:7
+    image: redis:${REDIS_VERSION:-7}
   rediswrapper:
     container_name: rediswrapper
     networks:
       - testnet
     build:
       context: .
+      args:
+        ALPINE_VERSION: ${ALPINE_VERSION:-3.16}
+        GO_VERSION: ${GO_VERSION:-1.18}
     ports:
       - 8080:8080
     environment:
