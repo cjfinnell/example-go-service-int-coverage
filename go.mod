@@ -7,6 +7,7 @@ require (
 	github.com/golangci/golangci-lint v1.47.2
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/matryer/is v1.4.0
 	github.com/stretchr/testify v1.8.0
 	github.com/vektra/mockery/v2 v2.12.2
 	gotest.tools/gotestsum v1.8.1

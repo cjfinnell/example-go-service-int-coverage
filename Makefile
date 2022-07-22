@@ -9,6 +9,10 @@ mocks: .bin/mockery
 	@echo "generating mocks..."
 	@go generate ./...
 
+.PHONY: test
+test: .bin/gotestsum
+	@.bin/gotestsum ./... -- -parallel
+
 .PHONY: run
 run:
 	@docker compose up --build --force-recreate
@@ -17,6 +21,7 @@ run:
 clean:
 	@docker compose rm -sf
 	@rm -rf .bin/
+	@go clean -testcache
 
 .PHONY: lint
 lint: .bin/golangci-lint
@@ -36,3 +41,7 @@ lint-fix: .bin/golangci-lint
 .bin/mockery: $(wildcard vendor/github.com/vektra/mockery/*/*.go) redis.go Makefile .bin
 	@echo "building mock generator..."
 	@cd vendor/github.com/vektra/mockery/v2 && go build -o $(shell git rev-parse --show-toplevel)/.bin/mockery .
+
+.bin/gotestsum: $(wildcard vendor/gotest.bin/*/*.go) Makefile .bin
+	@echo "building test runner..."
+	@cd vendor/gotest.tools/gotestsum && go build -o $(shell git rev-parse --show-toplevel)/.bin/gotestsum .
