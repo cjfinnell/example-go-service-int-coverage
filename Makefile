@@ -19,10 +19,11 @@ test:
 	@docker build --target test -t rediswrapper-int-test .
 	@docker run -it --network testnet --name rediswrapper-int-test rediswrapper-int-test
 	@docker cp rediswrapper-int-test:/test/coverage.txt .
+	@docker cp rediswrapper-int-test:/test/results.xml .
 
 .PHONY: _int-test
 _int-test: .bin/gotestsum
-	@.bin/gotestsum -- -cover -coverprofile coverage.txt ./...
+	@.bin/gotestsum --junitfile results.xml -- -cover -coverprofile coverage.txt ./...
 
 .PHONY: fuzz
 fuzz:
@@ -34,7 +35,8 @@ fuzz:
 .PHONY: load
 load:
 	@docker compose up -d --build --force-recreate
-	-@docker run -i --network testnet --name k6 loadimpact/k6 run - < load.js
+	-@docker run -i --network testnet --name k6 loadimpact/k6 run --out json=/tmp/stats.json - < load.js
+	@docker cp k6:/tmp/stats.json .
 	@docker compose down
 
 .PHONY: run
@@ -46,7 +48,7 @@ clean:
 	@docker compose rm -sf
 	-@docker rm -f rediswrapper-int-test rediswrapper-fuzz k6
 	-@docker network rm testnet
-	@rm -rf .bin/ coverage.txt
+	@rm -rf .bin/ coverage.txt results.xml stats.json
 	@go clean -testcache
 
 .PHONY: lint

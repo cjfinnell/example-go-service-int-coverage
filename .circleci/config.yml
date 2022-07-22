@@ -7,6 +7,10 @@ executors:
     docker:
       - image: cimg/go:1.18
     resource_class: small
+  node:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
 
 jobs:
   lint:
@@ -33,6 +37,8 @@ jobs:
             ALPINE_VERSION: << parameters.alpine_version >>
             GO_VERSION: << parameters.go_version >>
             REDIS_VERSION: << parameters.redis_version >>
+      - store_test_results:
+          path: results.xml
       - when:
           condition:
             and:
@@ -42,12 +48,18 @@ jobs:
           steps:
             - codecov/upload
   load:
-    executor: go
+    executor: node
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.14
+      - run: npm install -g k6-to-junit
       - run: make load
+      - store_artifacts:
+          path: stats.json
+      - run: cat stats.json | k6-to-junit k6-results.xml
+      - store_test_results:
+          path: k6-results.xml
 
 
 workflows:

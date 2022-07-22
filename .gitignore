@@ -1,2 +1,4 @@
 .bin/
 coverage.txt
+results.xml
+stats.json
